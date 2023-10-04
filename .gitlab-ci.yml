@@ -1,0 +1,74 @@
+stages:
+  - Build
+  - Publish
+  - Deploy
+
+default:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+
+variables:
+  KUBE_CONTEXT: "uitsmijter/shared-agent:pawpatrol"
+  GIT_SUBMODULE_STRATEGY: recursive
+  IMAGE_TAG: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+
+.use_context: &use_context
+  - kubectl config get-contexts
+  - kubectl config use-context "$KUBE_CONTEXT"
+
+# ------------------------------------------------------------
+# Build
+# ------------------------------------------------------------
+Build:
+  stage: Build
+  script:
+    - mkdir -p /kaniko/.docker
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/deployment/Dockerfile"
+      --tarPath api-image.tar --destination=${IMAGE_TAG} --no-push
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    paths:
+      - api-image.tar
+    when: on_success
+    expire_in: 1 hours
+
+# ------------------------------------------------------------
+# Publish
+# ------------------------------------------------------------
+Publish:
+  stage: Publish
+  needs:
+    - Build
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [ "" ]
+  script:
+    - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - crane push api-image.tar ${IMAGE_TAG}
+
+
+# ------------------------------------------------------------
+# Deploy
+# ------------------------------------------------------------
+Deploy:
+  stage: Deploy
+  image: ausdertechnik/buildbot-margarete@sha256:9127b6b2a5cd54400727be4c54f41c9fcee312488315fe7327e8aa725589bdb4
+  needs:
+    - Publish
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - *use_context
+    - pushd deployment/kustomize/base
+    - kustomize edit set image ${CI_REGISTRY_IMAGE}=${IMAGE_TAG};
+    - popd
+    - kubectl create ns "uitsmijter-php" || true
+    - kubectl label --overwrite namespace uitsmijter-php uitsmijter.io/cert-sync=true
+    - kubectl apply -n "uitsmijter-php" -f ${PAWPATROL_PULLSECRET}
+    - kubectl apply -k deployment/kustomize/overlays/pawpatrol

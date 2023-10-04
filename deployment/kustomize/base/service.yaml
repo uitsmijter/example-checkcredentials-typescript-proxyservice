@@ -1,0 +1,15 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: checkcredentials
+
+spec:
+  selector:
+    app: checkcredentials
+    component: api
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
