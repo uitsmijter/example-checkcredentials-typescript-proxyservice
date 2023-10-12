@@ -11,6 +11,7 @@ RUN yarn install
 
 ADD tsconfig.json tslint.json /opt/build/
 ADD src /opt/build/src
+ADD prisma /opt/build/prisma
 
 RUN yarn audit --production
 RUN yarn test
