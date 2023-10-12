@@ -16,8 +16,12 @@ ADD prisma /opt/build/prisma
 RUN yarn audit --production
 RUN yarn test
 RUN yarn build
+
 RUN yarn install --production
+RUN npx prisma generate
+
 RUN cp -r /opt/build/node_modules /opt/build/dist
+
 
 # ----------------------------------------------------------------------------------------
 FROM node:20.6.0-slim as runtime
