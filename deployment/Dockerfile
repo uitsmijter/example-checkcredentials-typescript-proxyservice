@@ -3,7 +3,7 @@ FROM node:20.6.0-bullseye as buildstage
 MAINTAINER aus der Technik
 
 RUN apt-get update; apt-get upgrade -y; apt-get install -y \
-    curl
+    curl libssl1.1
 
 ADD package.json yarn.lock /opt/build/
 WORKDIR /opt/build
@@ -24,7 +24,10 @@ RUN cp -r /opt/build/node_modules /opt/build/dist
 
 
 # ----------------------------------------------------------------------------------------
-FROM node:20.6.0-slim as runtime
+FROM node:20.6.0-bullseye-slim as runtime
+
+RUN apt-get update; apt-get upgrade -y; apt-get install -y \
+    curl libssl1.1
 
 RUN mkdir -p /opt/app
 
