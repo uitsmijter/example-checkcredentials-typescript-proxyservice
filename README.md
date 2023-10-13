@@ -23,9 +23,8 @@ application.
 
 ## Routes
 
-```
 POST **/validate-login**
-```
+
 Check if a user with a password is authenticated to log in. 
 
 Request: 
@@ -47,10 +46,8 @@ Response:
 
 ```
 
-
-```
 POST **/validate-user**
-```
+
 Check if a user is still valid.
 
 Request:
