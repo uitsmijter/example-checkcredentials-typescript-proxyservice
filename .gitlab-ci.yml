@@ -68,7 +68,7 @@ Deploy:
     - pushd deployment/kustomize/base
     - kustomize edit set image ${CI_REGISTRY_IMAGE}=${IMAGE_TAG};
     - popd
-    - kubectl create ns "uitsmijter-php" || true
-    - kubectl label --overwrite namespace uitsmijter-php uitsmijter.io/cert-sync=true
-    - kubectl apply -n "uitsmijter-php" -f ${PAWPATROL_PULLSECRET}
-    - kubectl apply -k deployment/kustomize/overlays/pawpatrol
+    - kubectl create ns "migration-example-php" || true
+    - kubectl label --overwrite namespace migration-example-php uitsmijter.io/cert-sync=true
+    - kubectl apply -n "migration-example-php" -f ${PAWPATROL_PULLSECRET}
+    - kubectl apply -k deployment/kustomize/overlays/production
