@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: docker pull ghcr.io/uitsmijter/example-checkcredentials-typescript-proxyservice:nightly
+        image: ghcr.io/uitsmijter/example-checkcredentials-typescript-proxyservice:nightly
         envFrom: # ENV FROM PHP App
           - secretRef:
               name: env
