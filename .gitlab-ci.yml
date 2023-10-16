@@ -59,8 +59,6 @@ Publish:
 Deploy:
   stage: Deploy
   image: ausdertechnik/buildbot-margarete@sha256:9127b6b2a5cd54400727be4c54f41c9fcee312488315fe7327e8aa725589bdb4
-  needs:
-    - Publish
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
