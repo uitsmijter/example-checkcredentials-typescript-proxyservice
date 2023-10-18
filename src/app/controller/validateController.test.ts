@@ -3,6 +3,7 @@ import app from '../app';
 import { StatusCodes } from 'http-status-codes';
 import { prismaMock } from '../singleton';
 import prisma from '../client';
+import {hash, hashSync} from "bcrypt";
 
 test('Validate login without properties', async () => {
   prismaMock.users.create.mockImplementation();
@@ -19,15 +20,16 @@ test('Validate login unknown user', async () => {
       .post('/validate-login')
       .send({ username: 'James', password: 'fake-password' });
 
-  expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
+  expect(response.status).toBe(StatusCodes.NOT_FOUND);
 });
 
 test('Validate login ok', async () => {
   prismaMock.users.create.mockImplementation();
-
+  const bhash = hashSync('real-password', 10);
+  console.log("--", bhash);
   const user = {
     name: 'James',
-    password: 'real-password',
+    password: bhash,
     email: 'james@example.com',
   };
   prismaMock.users.findFirst.mockResolvedValue({
