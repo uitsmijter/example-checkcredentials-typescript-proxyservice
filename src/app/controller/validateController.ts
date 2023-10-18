@@ -16,7 +16,7 @@ export const validateLoginController: Middleware = async (ctx) => {
     where: {email: body.username},
   });
   if (user) {
-    console.log(`DBG: ${body.password!} must match §{user.password}`);
+    console.log(`DBG: ${body.password!} must match ${user.password}`);
     const valid = compareSync(body.password!, user.password);
     if (valid) {
       ctx.body = JSON.parse(
