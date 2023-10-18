@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { PrismaClient } from '@prisma/client';
 import { Credentials } from '../models/Credentials';
 import prisma from '../client';
-import {compare} from "bcrypt";
+import { compareSync } from "bcrypt";
 
 // Validates credentials of the user
 export const validateLoginController: Middleware = async (ctx) => {
@@ -17,7 +17,7 @@ export const validateLoginController: Middleware = async (ctx) => {
   });
   if (user) {
     console.log(`DBG: ${body.password!} must match §{user.password}`);
-    const valid = await compare(body.password!, user.password);
+    const valid = compareSync(body.password!, user.password);
     if (valid) {
       ctx.body = JSON.parse(
           JSON.stringify(
