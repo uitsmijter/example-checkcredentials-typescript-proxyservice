@@ -7,7 +7,6 @@ import {compare} from "bcrypt";
 
 // Validates credentials of the user
 export const validateLoginController: Middleware = async (ctx) => {
-  console.log(">>>", JSON.stringify(ctx.request.body, null, 2))
   const body: Credentials = ctx.request.body as Credentials;
   if (body.username === undefined || body.username.length <= 0
       || body.password === undefined || body.password.length <= 0) {
@@ -17,6 +16,7 @@ export const validateLoginController: Middleware = async (ctx) => {
     where: {email: body.username},
   });
   if (user) {
+    console.log(`DBG: ${body.password!} must match §{user.password}`);
     const valid = await compare(body.password!, user.password);
     if (valid) {
       ctx.body = JSON.parse(
