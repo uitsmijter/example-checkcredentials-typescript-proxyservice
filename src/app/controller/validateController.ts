@@ -7,10 +7,11 @@ import {compare} from "bcrypt";
 
 // Validates credentials of the user
 export const validateLoginController: Middleware = async (ctx) => {
+  console.log(">>>", JSON.stringify(ctx.request.body, null, 2))
   const body: Credentials = ctx.request.body as Credentials;
   if (body.username === undefined || body.username.length <= 0
       || body.password === undefined || body.password.length <= 0) {
-    ctx.throw(StatusCodes.NOT_ACCEPTABLE, 'missing credentials');
+    ctx.throw(StatusCodes.NOT_ACCEPTABLE, `missing credentials for user ${body.username}`);
   }
   const user = await prisma.users.findFirst({
     where: {email: body.username},
