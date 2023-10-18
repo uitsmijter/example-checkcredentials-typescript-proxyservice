@@ -26,7 +26,6 @@ test('Validate login unknown user', async () => {
 test('Validate login ok', async () => {
   prismaMock.users.create.mockImplementation();
   const bhash = hashSync('real-password', 10);
-  console.log("--", bhash);
   const user = {
     name: 'James',
     password: bhash,
@@ -49,6 +48,32 @@ test('Validate login ok', async () => {
   expect(response.body).toHaveProperty('name');
   expect(response.body).not.toHaveProperty('password');
   expect(response.body.name).toBe('James');
+});
+
+test('Validate igor login', async () => {
+  prismaMock.users.create.mockImplementation();
+  const user = {
+    name: 'Paula',
+    password: '$2y$10$s3Q5LRVVLDHpujjik7121ORGGLtjR3zM4mKNSA0EJ7KG96YYKIcOy',
+    email: 'paula@example.com',
+  };
+  prismaMock.users.findFirst.mockResolvedValue({
+    ...user,
+    id: BigInt(1),
+    email_verified_at: null,
+    remember_token: null,
+    created_at: null,
+    updated_at: null,
+  });
+
+  const response = await request(app.callback())
+      .post('/validate-login')
+      .send({ username: 'paula@example.com', password: 'another-password' });
+
+  expect(response.status).toBe(StatusCodes.OK);
+  expect(response.body).toHaveProperty('name');
+  expect(response.body).not.toHaveProperty('password');
+  expect(response.body.name).toBe('Paula');
 });
 
 test('Validate existence without properties', async () => {
