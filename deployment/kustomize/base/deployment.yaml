@@ -22,6 +22,7 @@ spec:
       containers:
       - name: api
         image: ghcr.io/uitsmijter/example-checkcredentials-typescript-proxyservice:nightly
+        imagePullPolicy: Always
         envFrom: # ENV FROM PHP App
           - secretRef:
               name: env
